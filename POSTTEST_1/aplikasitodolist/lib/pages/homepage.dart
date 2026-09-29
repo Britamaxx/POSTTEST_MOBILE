@@ -1,24 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:aplikasitodolist/models/tugas.dart';
 import 'package:aplikasitodolist/widgets/activities.dart';
 import 'package:aplikasitodolist/widgets/categoryChip.dart';
-
+import 'package:aplikasitodolist/pages/detailtugaspage.dart';
+ 
 // HomePage adalah halaman utama aplikasi To-Do List "Karsa"
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
+ 
   @override
   State<HomePage> createState() => _HomePageState();
 }
-
+ 
 class _HomePageState extends State<HomePage> {
   // selectedCategory: menyimpan kategori mana yang sedang aktif dipilih
   String selectedCategory = 'Hari Ini';
-
+ 
+  // daftar tugas hari ini
+  final List<Tugas> tugasHariIni = [
+    Tugas(
+      title: 'Jumpa Dosen Pembimbing',
+      description: 'Bimbingan skripsi dan konsultasi progres',
+      time: '09.00',
+      durasi: 30,
+      isDone: true,
+    ),
+    Tugas(
+      title: 'Rapat Organisasi',
+      description: 'Membahas agenda kegiatan organisasi',
+      time: '13.00',
+      durasi: 15,
+    ),
+    Tugas(
+      title: 'Rapat Kelompok',
+      description: 'Diskusi progres tugas kelompok',
+      time: '16.00',
+      durasi: 15,
+    ),
+  ];
+ 
+  // membuka halaman detail dengan Navigator.push
+  void bukaDetail(Tugas tugas) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DetailTugasPage(tugas: tugas)),
+    );
+  }
+ 
   @override
   Widget build(BuildContext context) {
     const merah = Color(0xFFD9472B);
     const emas = Color(0xFFFFB800);
-
+ 
     return Scaffold(
       backgroundColor: const Color(0xFFFAF7F2),
       body: SafeArea( // memastikan konten tidak tertutup area perangkat (notch, status bar)
@@ -33,6 +66,20 @@ class _HomePageState extends State<HomePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Row: logo aplikasi di samping judul dan tagline
+                    Row(
+                      children: [
+                        // Image.asset: logo Karsa dari folder assets/images
+                        Image.asset(
+                          'assets/images/LogoKarsa.png',
+                          width: 44,
+                          height: 44,
+                          fit: BoxFit.contain,
+                          // errorBuilder: tampilan cadangan jika file logo tidak ditemukan
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.image_outlined, color: merah, size: 44),
+                        ),
+                        const SizedBox(width: 10),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -58,20 +105,42 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    // Container untuk lingkaran warna sebagai latar ikon notifikasi
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: emas.withOpacity(0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      // Icon notifikasi
-                      child: const Icon(Icons.notifications_none_rounded, color: emas, size: 22),
+                      ],
+                    ),
+                    // Stack: menumpuk titik merah (badge) di atas ikon notifikasi
+                    Stack(
+                      children: [
+                        // Container untuk lingkaran warna sebagai latar ikon notifikasi
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: emas.withOpacity(0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          // Icon notifikasi
+                          child: const Icon(Icons.notifications_none_rounded, color: emas, size: 22),
+                        ),
+                        // Positioned: menempatkan titik badge di pojok kanan atas ikon
+                        Positioned(
+                          top: 8,
+                          right: 10,
+                          // Container: titik merah penanda notifikasi baru
+                          child: Container(
+                            width: 9,
+                            height: 9,
+                            decoration: BoxDecoration(
+                              color: merah,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1.5),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
-
+ 
                 // Container untuk divider tema dekoratif Nusantara
                 Container(
                   height: 2,
@@ -83,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(height: 18),
-
+ 
                 // TextField: input untuk mencari tugas
                 TextField(
                   decoration: InputDecoration(
@@ -104,10 +173,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
+ 
                 // Row untuk kotak-kotak kategori tugas (Hari Ini, Favorit, Selesai)
                 Row(
                   children: [
+                    // Expanded: membagi lebar Row sama rata untuk setiap kategori
                     Expanded(
                       child: CategoryChip(
                         icon: Icons.today_rounded,
@@ -140,11 +210,12 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 const SizedBox(height: 20),
-
+ 
                 // Row untuk judul daftar tugas dan badge jumlah tugas
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Text: judul bagian daftar tugas
                     const Text(
                       'Tugas Hari Ini',
                       style: TextStyle(
@@ -161,9 +232,9 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       // Text: jumlah tugas hari ini
-                      child: const Text(
-                        '3 Tugas',
-                        style: TextStyle(
+                      child: Text(
+                        '${tugasHariIni.length} Tugas',
+                        style: const TextStyle(
                           fontSize: 11,
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -173,49 +244,22 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 const SizedBox(height: 12),
-
+ 
                 // Daftar tugas, tiap tugas ditampilkan lewat ActivityCard (activities.dart)
-                const ActivityCard(
-                  title: 'Jumpa Dosen Pembimbing',
-                  description: 'Bimbingan skripsi dan konsultasi progres',
-                  time: '09.00',
-                  isDone: true,
-                ),
-                const SizedBox(height: 10),
-                const ActivityCard(
-                  title: 'Rapat Organisasi',
-                  description: 'Membahas agenda kegiatan organisasi',
-                  time: '13.00',
-                  isDone: false,
-                ),
-                const SizedBox(height: 10),
-                const ActivityCard(
-                  title: 'Rapat Kelompok',
-                  description: 'Diskusi progres tugas kelompok',
-                  time: '16.00',
-                  isDone: false,
-                ),
-                const SizedBox(height: 30),
+                // saat kartu di-tap, pindah ke DetailTugasPage lewat Navigator.push
+                for (final t in tugasHariIni)
+                  ActivityCard(
+                    title: t.title,
+                    description: t.description,
+                    time: t.time,
+                    isDone: t.isDone,
+                    onTap: () => bukaDetail(t),
+                  ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
         ),
-      ),
-
-      // BottomNavigationBar untuk navigasi utama di bagian bawah halaman
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        selectedItemColor: merah,
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        elevation: 8,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Beranda'),
-          BottomNavigationBarItem(icon: Icon(Icons.checklist_rounded), label: 'Tugas'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Profil'),
-        ],
       ),
     );
   }
