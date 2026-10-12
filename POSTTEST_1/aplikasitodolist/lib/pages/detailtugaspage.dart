@@ -1,163 +1,229 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:aplikasitodolist/models/tugas.dart';
- 
-// DetailTugasPage: menampilkan rincian satu tugas
+import 'package:aplikasitodolist/providers/tugas_provider.dart';
+import 'package:aplikasitodolist/theme/app_colors.dart';
+
 class DetailTugasPage extends StatelessWidget {
-  final Tugas tugas; // data tugas yang dikirim dari halaman sebelumnya
- 
+  final Tugas tugas;
+
   const DetailTugasPage({super.key, required this.tugas});
- 
+
   @override
   Widget build(BuildContext context) {
-    const merah = Color(0xFFD9472B);
- 
+    final isDone = context
+        .watch<TugasProvider>()
+        .daftarTugas
+        .any((item) => identical(item, tugas) && item.isDone);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF7F2),
-      // Stack: menumpuk banner, panel isi, dan tombol kembali pada area yang sama
-      body: Stack(
-        children: [
-          // Positioned: banner gambar menempel di bagian atas layar
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 240,
-            // Container: latar banner berwarna lembut, logo ditaruh di tengah
-            child: Container(
-              color: merah.withOpacity(0.15),
-              padding: const EdgeInsets.only(top: 40, bottom: 50),
-              // Image.asset: logo Karsa dari folder assets/images
-              child: Image.asset(
-                'assets/images/LogoKarsa.png',
-                fit: BoxFit.contain,
-                // errorBuilder: tampilan cadangan jika file logo tidak ditemukan
-                errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.image_outlined, color: merah, size: 48),
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppColors.primary, AppColors.primaryDark],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(30),
+                ),
               ),
-            ),
-          ),
- 
-          // Positioned: panel isi menumpuk di atas banner, mulai dari y = 210
-          Positioned(
-            top: 210,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            // Container: panel putih dengan sudut atas membulat dan bayangan
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                boxShadow: [
-                  // BoxShadow: bayangan ke arah atas panel
-                  BoxShadow(
-                    color: Colors.grey.shade300,
-                    blurRadius: 10,
-                    offset: const Offset(0, -3),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    tooltip: 'Kembali',
+                    icon: const Icon(
+                      Icons.arrow_back_rounded,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'DETAIL KEGIATAN',
+                    style: TextStyle(
+                      color: Color(0xFFE8D8BC),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    tugas.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ],
               ),
-              // SingleChildScrollView: agar isi panel bisa di-scroll
+            ),
+            Expanded(
               child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Text: judul tugas
-                    Text(
-                      tugas.title,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
-                    ),
-                    const SizedBox(height: 12),
- 
-                    // Row: ikon jam dan waktu tugas
                     Row(
                       children: [
-                        // Icon jam
-                        const Icon(Icons.access_time_rounded, size: 18, color: merah),
-                        const SizedBox(width: 8),
-                        // Text: jam tugas
-                        Text(tugas.time, style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
- 
-                    // Row: ikon pengingat dan durasi
-                    Row(
-                      children: [
-                        // Icon pengingat
-                        const Icon(Icons.timer_outlined, size: 18, color: merah),
-                        const SizedBox(width: 8),
-                        // Text: durasi pengingat
-                        Text('${tugas.durasi} menit', style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
- 
-                    // Row: ikon status dan keterangan selesai/belum
-                    Row(
-                      children: [
-                        // Icon status
-                        Icon(
-                          tugas.isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
-                          size: 18,
-                          color: tugas.isDone ? Colors.green : Colors.grey,
+                        Expanded(
+                          child: _InfoCard(
+                            icon: Icons.access_time_rounded,
+                            label: 'Waktu',
+                            value: tugas.time,
+                          ),
                         ),
-                        const SizedBox(width: 8),
-                        // Text: status tugas
-                        Text(
-                          tugas.isDone ? 'Selesai' : 'Belum selesai',
-                          style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _InfoCard(
+                            icon: Icons.timer_outlined,
+                            label: 'Pengingat',
+                            value: '${tugas.durasi} menit',
+                          ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Catatan',
+                      style: TextStyle(
+                        color: AppColors.text,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Text(
+                        tugas.description.isEmpty
+                            ? 'Tidak ada catatan untuk tugas ini.'
+                            : tugas.description,
+                        style: const TextStyle(
+                          color: AppColors.muted,
+                          fontSize: 13,
+                          height: 1.6,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: isDone
+                            ? AppColors.green.withValues(alpha: 0.1)
+                            : AppColors.accentSoft,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isDone
+                                ? Icons.check_circle_rounded
+                                : Icons.radio_button_unchecked_rounded,
+                            color: isDone
+                                ? AppColors.green
+                                : AppColors.primary,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            isDone ? 'Tugas sudah selesai' : 'Tugas masih aktif',
+                            style: const TextStyle(
+                              color: AppColors.text,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 20),
- 
-                    // Text: label bagian deskripsi
-                    const Text('Deskripsi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                    const SizedBox(height: 6),
-                    // Text: isi deskripsi tugas
-                    Text(
-                      tugas.description,
-                      style: TextStyle(fontSize: 13.5, height: 1.5, color: Colors.grey.shade700),
-                    ),
-                    const SizedBox(height: 28),
- 
-                    // SizedBox: membuat tombol selebar panel
                     SizedBox(
                       width: double.infinity,
-                      // ElevatedButton: tombol kembali ke halaman sebelumnya
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.pop(context), // Navigator.pop: kembali ke halaman sebelumnya
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: merah,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: FilledButton.icon(
+                        onPressed: () => context
+                            .read<TugasProvider>()
+                            .ubahStatusTugas(tugas),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                         ),
-                        // Text: label tombol
-                        child: const Text('Kembali', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                        icon: Icon(
+                          isDone
+                              ? Icons.undo_rounded
+                              : Icons.check_rounded,
+                        ),
+                        label: Text(
+                          isDone
+                              ? 'Tandai belum selesai'
+                              : 'Tandai sebagai selesai',
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _InfoCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(17),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: AppColors.accent, size: 20),
+          const SizedBox(height: 11),
+          Text(
+            label,
+            style: const TextStyle(color: AppColors.muted, fontSize: 11),
           ),
- 
-          // Positioned: tombol kembali melayang di pojok kiri atas banner
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
-            left: 16,
-            // GestureDetector: mendeteksi tap pada tombol
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context), // Navigator.pop: kembali ke halaman sebelumnya
-              // Container: lingkaran putih sebagai latar ikon
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                // Icon panah kembali
-                child: const Icon(Icons.arrow_back_rounded, color: merah, size: 22),
-              ),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: const TextStyle(
+              color: AppColors.text,
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
             ),
           ),
         ],

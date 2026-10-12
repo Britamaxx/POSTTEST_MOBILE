@@ -1,151 +1,257 @@
 import 'package:flutter/material.dart';
- 
-// ProfilPage: halaman profil pengguna
+import 'package:provider/provider.dart';
+import 'package:aplikasitodolist/providers/tugas_provider.dart';
+import 'package:aplikasitodolist/theme/app_colors.dart';
+
 class ProfilPage extends StatelessWidget {
   const ProfilPage({super.key});
- 
-  // membuat satu kotak statistik (angka + label)
-  Widget kotakStatistik(String angka, String label) {
-    // Container: kotak putih dengan bayangan
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          // BoxShadow: bayangan halus di sekitar kotak
-          BoxShadow(color: Colors.grey.shade300, blurRadius: 10, offset: const Offset(0, 3)),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Text: angka statistik
-          Text(angka, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFD9472B))),
-          const SizedBox(height: 2),
-          // Text: label statistik
-          Text(label, style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600)),
-        ],
-      ),
-    );
-  }
- 
-  // membuat satu baris menu (ikon + teks)
-  Widget barisMenu(IconData icon, String teks) {
-    // Container: baris menu berlatar putih
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-      child: Row(
-        children: [
-          // Icon menu
-          Icon(icon, color: const Color(0xFFD9472B), size: 20),
-          const SizedBox(width: 12),
-          // Expanded: teks mengisi sisa ruang
-          Expanded(child: Text(teks, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))),
-          // Icon panah kanan
-          Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400),
-        ],
-      ),
-    );
-  }
- 
+
   @override
   Widget build(BuildContext context) {
-    const merah = Color(0xFFD9472B);
-    const emas = Color(0xFFFFB800);
- 
+    final tugasProvider = context.watch<TugasProvider>();
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF7F2),
-      // SingleChildScrollView: agar halaman bisa di-scroll
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Stack: menumpuk foto profil di atas banner
-            Stack(
-              clipBehavior: Clip.none, // agar foto boleh keluar dari batas banner
-              children: [
-                // Container: banner gradien di bagian atas
-                Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(colors: [merah, emas]),
-                  ),
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 22, 20, 28),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Profil',
+                style: TextStyle(
+                  color: AppColors.text,
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
                 ),
-                // Positioned: foto profil di tengah, separuh keluar dari banner
-                Positioned(
-                  bottom: -45,
-                  left: 0,
-                  right: 0,
-                  // Center: menempatkan foto di tengah horizontal
-                  child: Center(
-                    // Container: bingkai lingkaran dengan bayangan
-                    child: Container(
-                      width: 90,
-                      height: 90,
+              ),
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppColors.primary, AppColors.primaryDark],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 86,
+                      height: 86,
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
                         color: Colors.white,
-                        border: Border.all(color: Colors.white, width: 4),
-                        boxShadow: [
-                          // BoxShadow: bayangan di sekitar foto
-                          BoxShadow(color: Colors.grey.shade400, blurRadius: 10, offset: const Offset(0, 3)),
-                        ],
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.accent,
+                          width: 3,
+                        ),
                       ),
-                      // ClipOval: memotong gambar menjadi lingkaran
-                      child: ClipOval(
-                        // Image.asset: logo Karsa sebagai foto profil sementara
-                        child: Image.asset(
-                          'assets/images/LogoKarsa.png',
-                          width: 90,
-                          height: 90,
-                          fit: BoxFit.contain,
-                          // errorBuilder: tampilan cadangan jika file gambar belum ada
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: merah.withOpacity(0.15),
-                            child: const Icon(Icons.person_rounded, color: merah, size: 44),
-                          ),
+                      child: Image.asset(
+                        'assets/images/LogoKarsa.png',
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, _, _) => const Icon(
+                          Icons.person_rounded,
+                          color: AppColors.primary,
+                          size: 42,
                         ),
                       ),
                     ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Nama Pengguna',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Informatika · Universitas Mulawarman',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFFE8D8BC),
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 22),
+              const Text(
+                'Ringkasan aktivitas',
+                style: TextStyle(
+                  color: AppColors.text,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _StatCard(
+                      number: '${tugasProvider.daftarTugas.length}',
+                      label: 'Total tugas',
+                      icon: Icons.event_note_rounded,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _StatCard(
+                      number: '${tugasProvider.jumlahSelesai}',
+                      label: 'Selesai',
+                      icon: Icons.task_alt_rounded,
+                      color: AppColors.green,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _StatCard(
+                      number: '${tugasProvider.jumlahBelumSelesai}',
+                      label: 'Tertunda',
+                      icon: Icons.hourglass_bottom_rounded,
+                      color: AppColors.accent,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Tentang Karsa',
+                style: TextStyle(
+                  color: AppColors.text,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 12),
+              const _AboutTile(
+                icon: Icons.spa_outlined,
+                title: 'Ritme yang lebih teratur',
+                subtitle: 'Atur kegiatan dan capai satu target demi satu.',
+              ),
+              const SizedBox(height: 10),
+              const _AboutTile(
+                icon: Icons.favorite_border_rounded,
+                title: 'Dibuat untuk fokus',
+                subtitle: 'Daftar tugasmu tersimpan pada satu sumber state.',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final String number;
+  final String label;
+  final IconData icon;
+  final Color color;
+
+  const _StatCard({
+    required this.number,
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 5),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 19),
+          const SizedBox(height: 7),
+          Text(
+            number,
+            style: const TextStyle(
+              color: AppColors.text,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: const TextStyle(color: AppColors.muted, fontSize: 10),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AboutTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  const _AboutTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: const BoxDecoration(
+              color: AppColors.accentSoft,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: AppColors.muted,
+                    fontSize: 10.5,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 56), // ruang untuk bagian foto yang keluar dari banner
- 
-            // Text: nama pengguna
-            const Text('Nama Pengguna', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 2),
-            // Text: keterangan program studi
-            Text('Informatika, Universitas Mulawarman', style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600)),
-            const SizedBox(height: 20),
- 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  // Row: tiga kotak statistik
-                  Row(
-                    children: [
-                      Expanded(child: kotakStatistik('6', 'Total Tugas')),
-                      const SizedBox(width: 10),
-                      Expanded(child: kotakStatistik('2', 'Selesai')),
-                      const SizedBox(width: 10),
-                      Expanded(child: kotakStatistik('4', 'Tertunda')),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  barisMenu(Icons.notifications_none_rounded, 'Notifikasi'),
-                  barisMenu(Icons.palette_outlined, 'Tampilan'),
-                  barisMenu(Icons.info_outline_rounded, 'Tentang Aplikasi'),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+          const Icon(Icons.chevron_right_rounded, color: AppColors.muted),
+        ],
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // untuk FilteringTextInputFormatter
 import 'package:aplikasitodolist/models/tugas.dart';
+import 'package:aplikasitodolist/theme/app_colors.dart';
  
 // TambahTugasPage: form untuk menambah tugas baru
 class TambahTugasPage extends StatefulWidget {
@@ -87,10 +88,10 @@ class _TambahTugasPageState extends State<TambahTugasPage> {
  
   @override
   Widget build(BuildContext context) {
-    const merah = Color(0xFFD9472B);
+    const merah = AppColors.primary;
  
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF7F2),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         // SingleChildScrollView: agar form bisa di-scroll saat keyboard muncul
         child: SingleChildScrollView(

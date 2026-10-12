@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:aplikasitodolist/pages/mainpage.dart';
+import 'package:aplikasitodolist/providers/tugas_provider.dart';
+import 'package:aplikasitodolist/theme/app_colors.dart';
+import 'package:provider/provider.dart';
  
 void main() {
   runApp(const MyApp());
@@ -10,16 +13,27 @@ class MyApp extends StatelessWidget {
  
   @override
   Widget build(BuildContext context) {
-    // MaterialApp: widget akar yang mengatur tema dan halaman awal aplikasi
-    return MaterialApp(
-      title: 'Karsa', // nama aplikasi
-      debugShowCheckedModeBanner: false, // menonaktifkan tulisan debug di pojok kanan atas
-      theme: ThemeData(
-        fontFamily: 'Inter',
-        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFD9472B)),
-      ), // menentukan visual umum aplikasi
-      home: const MainPage(), // halaman pertama: MainPage yang memuat Navigation Bar
+    return ChangeNotifierProvider(
+      create: (_) => TugasProvider(),
+      child: MaterialApp(
+        title: 'Karsa',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          fontFamily: 'Inter',
+          scaffoldBackgroundColor: AppColors.background,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppColors.primary,
+            surface: AppColors.surface,
+          ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: AppColors.background,
+            foregroundColor: AppColors.text,
+            elevation: 0,
+          ),
+        ),
+        home: const MainPage(),
+      ),
     );
   }
 }
